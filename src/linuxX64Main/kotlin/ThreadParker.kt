@@ -6,6 +6,8 @@ import platform.posix.syscall
 const val FUTEX_WAIT = 0
 const val FUTEX_WAKE = 1
 
+// Requires linux 2.6 (2003)
+// Requires Darwin 16 (macOS 10.12, iOS 10.0, tvOS 10.0, and watchOS 3.0)
 @OptIn(ExperimentalForeignApi::class)
 actual class ThreadParker {
     var ptr: UIntVar? = null

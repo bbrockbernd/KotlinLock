@@ -1,4 +1,4 @@
-expect class ThreadParker {
+expect class ThreadParker() {
     fun park()
     fun unpark()
 }
