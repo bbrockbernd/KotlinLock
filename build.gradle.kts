@@ -21,6 +21,8 @@ kotlin {
         macosX64(),
     )
     
+    mingwX64()
+    
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -44,8 +46,7 @@ kotlin {
         val nativeTest by creating { dependsOn(commonTest) }
         val nativeMain by creating { dependsOn(commonMain) }
         val linuxX64Main by getting { dependsOn(nativeMain) }
-        val appleTest by creating { dependsOn(nativeTest) }
-        
+        val mingwX64Main by getting { dependsOn(nativeMain) }
         
     }
     

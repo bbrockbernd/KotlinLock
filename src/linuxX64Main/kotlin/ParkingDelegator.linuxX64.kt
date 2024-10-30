@@ -3,6 +3,9 @@ import platform.linux.SYS_futex
 import platform.posix.NULL
 import platform.posix.syscall
 
+const val FUTEX_WAIT = 0
+const val FUTEX_WAKE = 1
+
 @OptIn(ExperimentalForeignApi::class)
 actual class ParkingDelegator {
     actual fun createFutexPtr(): Long {

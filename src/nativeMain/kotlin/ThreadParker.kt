@@ -2,7 +2,7 @@ import kotlin.concurrent.AtomicInt
 import kotlin.concurrent.AtomicLong
 
 // Requires linux 2.6 (2003)
-// Requires Darwin 16 (macOS 10.12, iOS 10.0, tvOS 10.0, and watchOS 3.0)
+// Or Darwin 16 (macOS 10.12, iOS 10.0, tvOS 10.0, and watchOS 3.0)
 actual class ThreadParker {
     private val state = AtomicInt(STATE_FREE)
     private val atomicPtr = AtomicLong(0)
