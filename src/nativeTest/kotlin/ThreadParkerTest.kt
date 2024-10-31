@@ -65,9 +65,9 @@ class ThreadParkerTest {
         val nIterations = 1000
         
             
+        println("Starting test")
         val time1 = measureTime { 
             val peter = ThreadParker()
-            peter.park()
             val wrapper: MutablePair<ThreadParker, Boolean> = MutablePair(peter, false)
             val worker = Worker.start()
             worker.execute(TransferMode.SAFE, { wrapper }) { w ->
@@ -75,8 +75,10 @@ class ThreadParkerTest {
                     w.first.unpark()
             }
             
-            repeat(nIterations) {
+            repeat(nIterations) { i ->
+                println("Parking $i")
                 peter.park()
+                println("Unparked")
             }
             wrapper.second = true
            

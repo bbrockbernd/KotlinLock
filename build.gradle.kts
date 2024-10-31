@@ -47,6 +47,7 @@ kotlin {
         val nativeMain by creating { dependsOn(commonMain) }
         val linuxX64Main by getting { dependsOn(nativeMain) }
         val mingwX64Main by getting { dependsOn(nativeMain) }
+        val mingwX64Test by getting { dependsOn(nativeTest) }
         
     }
     
