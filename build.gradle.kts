@@ -20,8 +20,10 @@ kotlin {
         iosX64(),
         macosX64(),
     )
-    
-    mingwX64()
+   
+    val windowsTargets = listOf(
+        mingwX64(),
+    )
     
     sourceSets {
         val commonMain by getting {
@@ -59,6 +61,17 @@ kotlin {
                 defFile(project.file("src/nativeInterop/cinterop/ulock.def"))
                 packageName = "platform.darwin.ulock"
                 includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
+            }
+        }
+    }
+    
+    windowsTargets.forEach {
+        it.compilations.getByName("main").defaultSourceSet.dependsOn(sourceSets.nativeMain.get())
+        it.compilations.getByName("test").defaultSourceSet.dependsOn(sourceSets.nativeTest.get())
+        it.compilations.getByName("main").cinterops {
+            val synchapi by creating {
+                defFile(project.file("src/nativeInterop/cinterop/synchapi.def"))
+                packageName = "platform.windows.synchapi"
             }
         }
     }
