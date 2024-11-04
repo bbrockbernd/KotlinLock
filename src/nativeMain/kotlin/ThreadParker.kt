@@ -3,9 +3,11 @@ import kotlin.concurrent.AtomicLong
 
 // Requires linux 2.6 (2003)
 // Or Darwin 16 (macOS 10.12, iOS 10.0, tvOS 10.0, and watchOS 3.0)
+// Or Windows 8 and Windows Server 2012
 actual class ThreadParker {
     private val state = AtomicInt(STATE_FREE)
     private val atomicPtr = AtomicLong(0)
+    // TODO get rid of this obj
     private val delegator = ParkingDelegator()
 
     actual fun park() {
@@ -16,7 +18,6 @@ actual class ThreadParker {
                 atomicPtr.value = delegator.createFutexPtr()
                 delegator.wait(atomicPtr.value) { res ->
                     state.value = STATE_FREE
-                    println("[DEBUG] Park result: $res")
                     atomicPtr.value = 0
                 }
                 return
@@ -42,7 +43,6 @@ actual class ThreadParker {
             }
             if (currentState == STATE_PARKED) {
                 val result = delegator.wake(atomicPtr.value)
-                println("[DEBUG] Unpark result: $result")
                 if (result == 0) return
             }
         }

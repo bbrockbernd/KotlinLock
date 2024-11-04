@@ -6,6 +6,7 @@ import platform.posix.syscall
 const val FUTEX_WAIT = 0
 const val FUTEX_WAKE = 1
 
+//TODO deal with interrupts
 @OptIn(ExperimentalForeignApi::class)
 actual class ParkingDelegator {
     actual fun createFutexPtr(): Long {

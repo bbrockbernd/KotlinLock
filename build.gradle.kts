@@ -20,7 +20,11 @@ kotlin {
         iosX64(),
         macosX64(),
     )
-   
+
+//    androidNativeArm32()
+//    androidNativeArm64()
+//    androidNativeX86()
+//    androidNativeX64()
     val windowsTargets = listOf(
         mingwX64(),
     )
