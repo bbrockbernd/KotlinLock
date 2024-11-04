@@ -76,8 +76,8 @@ kotlin {
     }
     
     windowsTargets.forEach {
-        it.compilations.getByName("main").defaultSourceSet.dependsOn(sourceSets.nativeMain.get())
-        it.compilations.getByName("test").defaultSourceSet.dependsOn(sourceSets.nativeTest.get())
+//        it.compilations.getByName("main").defaultSourceSet.dependsOn(sourceSets.nativeMain.get())
+//        it.compilations.getByName("test").defaultSourceSet.dependsOn(sourceSets.nativeTest.get())
         
 //        it.compilations.getByName("main").cinterops {
 //            val synchapi by creating {
