@@ -26,7 +26,13 @@ kotlin {
 //    androidNativeX86()
 //    androidNativeX64()
     val windowsTargets = listOf(
-        mingwX64(),
+        mingwX64() {
+            binaries {
+                executable {
+                    freeCompilerArgs += listOf("-linker-option",  "-lSynchronization")
+                }
+            }
+        }
     )
     
     sourceSets {
@@ -72,12 +78,13 @@ kotlin {
     windowsTargets.forEach {
         it.compilations.getByName("main").defaultSourceSet.dependsOn(sourceSets.nativeMain.get())
         it.compilations.getByName("test").defaultSourceSet.dependsOn(sourceSets.nativeTest.get())
-        it.compilations.getByName("main").cinterops {
-            val synchapi by creating {
-                defFile(project.file("src/nativeInterop/cinterop/synchapi.def"))
-                packageName = "platform.windows.synchapi"
-            }
-        }
+        
+//        it.compilations.getByName("main").cinterops {
+//            val synchapi by creating {
+//                defFile(project.file("src/nativeInterop/cinterop/synchapi.def"))
+//                packageName = "platform.windows.synchapi"
+//            }
+//        }
     }
     
     linuxTargets.forEach {
