@@ -11,7 +11,7 @@ version = "1.0-SNAPSHOT"
 kotlin {
     
     jvm()
-    linuxX64()
+    val linuxTargets = listOf(linuxX64())
     
     // apple targets
     val appleTargets = listOf (
@@ -78,6 +78,11 @@ kotlin {
                 packageName = "platform.windows.synchapi"
             }
         }
+    }
+    
+    linuxTargets.forEach {
+        it.compilations.getByName("main").defaultSourceSet.dependsOn(sourceSets.nativeMain.get())
+        it.compilations.getByName("test").defaultSourceSet.dependsOn(sourceSets.nativeTest.get())
     }
     
 }
