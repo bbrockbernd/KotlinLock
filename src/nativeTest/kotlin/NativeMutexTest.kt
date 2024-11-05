@@ -12,16 +12,26 @@ import kotlin.uuid.Uuid
 class NativeMutexTest {
     
     @Test
-    fun compareWithAtomicFUSingleThread() {
+    fun compareWithComposeSingleThread() {
         repeat(3) {
-            val time1 = measureTime { 
-                singleTOld()
+            val time1 = measureTime {
+                singleTComp()
             }
             println("Old $time1")
             val time2 = measureTime {
                 singleTNew()
             }
             println("New $time2")
+        }
+    } 
+    
+    
+    fun singleTComp() {
+        val compLock = CompLock()
+        repeat(1000000) { 
+           compLock.synchronized { 
+               val a = 1
+           }
         }
     }
     
@@ -33,37 +43,28 @@ class NativeMutexTest {
         }
     }
     
-    fun singleTOld() {
-        val reentrantLock: ReentrantLock = ReentrantLock()
-        repeat(1000000) {
-            reentrantLock.lock()
-            reentrantLock.unlock()
-        }
-    }
-    
-    
-    @Test 
-    fun compareMultiThread() {
-        repeat(3) {
-            val timeNew = measureTime {
-                val newLock = NewLockInt()
-                mulitTestLock(newLock)
-            }
-            println("New $timeNew")
-            val timeOld = measureTime {
-                val oldLock = OldLockInt()
-                mulitTestLock(oldLock)
-            }
-            println("Old $timeOld")
-        }
-    }
-    
-    fun mulitTestLock(lockInt: LockInt) {
-        val nThreads = 1 
+   @Test
+   fun compareComposeMultiThread() {
+       repeat(3) {
+           val timeNew = measureTime {
+               val newLock = NewSyncInt()
+               mulitTestLock(newLock)
+           }
+           println("New $timeNew")
+           val timeOld = measureTime {
+               val oldLock = OldSyncInt()
+               mulitTestLock(oldLock)
+           }
+           println("Old $timeOld")
+       }
+   }
+
+    fun mulitTestLock(lockInt: SyncInt) {
+        val nThreads = 50 
         val countTo = 100000
         val futureList = mutableListOf<Future<Unit>>()
-        repeat(nThreads) { i -> 
-            val test = LockIntTest(lockInt, countTo, nThreads, i)
+        repeat(nThreads) { i ->
+            val test = SyncIntTest(lockInt, countTo, nThreads, i)
             futureList.add(testWithWorker(test))
         }
         futureList.forEach {
@@ -71,48 +72,49 @@ class NativeMutexTest {
         }
     }
     
-    fun testWithWorker(test: LockIntTest): Future<Unit> {
+    fun testWithWorker(test: SyncIntTest): Future<Unit> {
         val worker = Worker.start()
         return worker.execute(TransferMode.UNSAFE, { test }) { t ->
-            while (true) {
-                t.lockInt.lock()
-                if (t.lockInt.n % t.mod == t.id) t.lockInt.n++
-                if (t.lockInt.n >= t.max) {
-                    t.lockInt.unlock()
-                    break
+            var done = false
+            while (!done) {
+                t.syncInt.synchronized {
+                    if (t.syncInt.n % t.mod == t.id) t.syncInt.n++
+                    if (t.syncInt.n >= t.max) {
+                        done = true
+                    }
                 }
-                t.lockInt.unlock()
             }
         }
-        
     }
     
-    data class LockIntTest(
-        val lockInt: LockInt,
+    data class SyncIntTest(
+        val syncInt: SyncInt,
         val max: Int,
         val mod: Int,
         val id: Int,
     )
-        
-    class NewLockInt: LockInt{
+    
+    class OldSyncInt(): SyncInt {
+        private val lock = CompLock()
+        override var n = 0
+        override fun synchronized(block: () -> Unit) = lock.synchronized(block) 
+    }
+    
+    class NewSyncInt(): SyncInt {
         private val lock = NativeMutex()
         override var n = 0
-        override fun lock() = lock.lock()
-        override fun unlock() = lock.unlock()
+        override fun synchronized(block: () -> Unit) {
+            lock.lock()
+            block()
+            lock.unlock()
+        }
     }
     
-    class OldLockInt: LockInt {
-        private val lock = ReentrantLock()
-        override var n = 0
-        override fun lock() = lock.lock()
-        override fun unlock() = lock.unlock()
-    }
-    
-    interface LockInt {
-        fun lock()
-        fun unlock()
+    interface SyncInt {
+        fun synchronized(block: () -> Unit)
         var n: Int
     }
+    
     
     
     @Test

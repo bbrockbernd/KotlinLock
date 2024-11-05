@@ -29,7 +29,7 @@ kotlin {
         mingwX64() {
             binaries {
                 executable {
-                    freeCompilerArgs += listOf("-linker-option",  "-lSynchronization")
+                    linkerOpts += listOf("-lSynchronization")
                 }
             }
         }
@@ -39,6 +39,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
+                implementation("org.jetbrains.compose.runtime:runtime:1.7.0")
             }
         }
         
@@ -95,5 +96,7 @@ kotlin {
 }
 
 repositories {
+    google()
     mavenCentral()
+    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
 }
