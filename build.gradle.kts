@@ -28,7 +28,7 @@ kotlin {
     val windowsTargets = listOf(
         mingwX64() {
             binaries {
-                sharedLib {
+                staticLib {
                     linkerOpts += listOf("-lSynchronization")
                 }
             }
