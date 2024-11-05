@@ -29,7 +29,7 @@ kotlin {
         mingwX64() {
             binaries {
                 staticLib {
-                    linkerOpts += listOf("-lSynchronization")
+                    freeCompilerArgs += listOf("-linker-option", "-lSynchronization")
                 }
             }
         }
