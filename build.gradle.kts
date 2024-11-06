@@ -11,10 +11,8 @@ version = "1.0-SNAPSHOT"
 kotlin {
     
     mingwX64() {
-        binaries {
-            sharedLib {
-                freeCompilerArgs += listOf("-linker-option", "-lSynchronization")
-            }
+        binaries.all {
+            linkerOpts += "-lSynchronization"
         }
     }
     
