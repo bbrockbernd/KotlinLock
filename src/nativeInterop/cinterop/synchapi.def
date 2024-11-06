@@ -1,3 +1,0 @@
-headers = synchapi.h
-
-linkerOpts.mingw = -linker-option -lSynchronization
