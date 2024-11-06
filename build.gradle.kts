@@ -27,10 +27,8 @@ kotlin {
 //    androidNativeX64()
     val windowsTargets = listOf(
         mingwX64() {
-            binaries {
-                staticLib {
-                    freeCompilerArgs += listOf("-linker-option", "-lSynchronization")
-                }
+            binaries.all {
+                linkerOpts += "-lSynchronization"
             }
         }
     )
