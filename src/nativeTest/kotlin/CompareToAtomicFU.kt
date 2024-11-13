@@ -17,6 +17,10 @@ class CompareToAtomicFU {
                 singleTNew()
             }
             println("New $time2")
+            val time3 = measureTime {
+                sinleTNew2()
+            }
+            println("New 2 $time3")
         }
     }
     
@@ -28,6 +32,13 @@ class CompareToAtomicFU {
                 mulitTestLock(newLock)
             }
             println("New $timeNew")
+            
+            val timeNew2 = measureTime {
+                val newLock2 = NewLockInt2()
+                mulitTestLock(newLock2)
+            }
+            println("New 2 $timeNew2")
+            
             val timeOld = measureTime {
                 val oldLock = OldLockInt()
                 mulitTestLock(oldLock)
@@ -37,6 +48,14 @@ class CompareToAtomicFU {
     }
 
     fun singleTNew() {
+        val nativeMutex = NativeMutex()
+        repeat(1000000) {
+            nativeMutex.lock()
+            nativeMutex.unlock()
+        }
+    }
+    
+    fun sinleTNew2() {
         val nativeMutex = NativeMutex()
         repeat(1000000) {
             nativeMutex.lock()
@@ -53,7 +72,7 @@ class CompareToAtomicFU {
     }
     
     fun mulitTestLock(lockInt: LockInt) {
-        val nThreads = 1
+        val nThreads = 30
         val countTo = 100000
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->
@@ -86,6 +105,13 @@ class CompareToAtomicFU {
         val mod: Int,
         val id: Int,
     )
+    
+    class NewLockInt2: LockInt{
+        private val lock = NativeMutex()
+        override var n = 0
+        override fun lock() = lock.lock()
+        override fun unlock() = lock.unlock()
+    }
 
     class NewLockInt: LockInt{
         private val lock = NativeMutex()

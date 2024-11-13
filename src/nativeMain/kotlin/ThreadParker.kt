@@ -6,19 +6,17 @@ import kotlin.concurrent.AtomicLong
 // Or Windows 8 and Windows Server 2012
 actual class ThreadParker {
     private val state = AtomicInt(STATE_FREE)
-    private val atomicPtr = AtomicLong(0)
-    // TODO get rid of this obj
-    private val delegator = ParkingDelegator()
+    private val atomicPtr = AtomicLong(-1L)
 
     actual fun park() {
         while (true) {
             val currentState = state.value
             if (currentState == STATE_FREE) {
                 if (!state.compareAndSet(currentState, STATE_PARKED)) continue
-                atomicPtr.value = delegator.createFutexPtr()
-                delegator.wait(atomicPtr.value) { res ->
+                initPtrIfAbsent()
+                ParkingUtils.wait(atomicPtr.value) { res ->
                     state.value = STATE_FREE
-                    atomicPtr.value = 0
+                    atomicPtr.value = -1L
                 }
                 return
             }
@@ -36,15 +34,27 @@ actual class ThreadParker {
     actual fun unpark() {
         while (true) {
             val currentState = state.value
-            if (currentState == STATE_UNPARKED) return
+            if (currentState == STATE_UNPARKED) {
+                return
+            }
             if (currentState == STATE_FREE) {
                 if (!state.compareAndSet(currentState, STATE_UNPARKED)) continue
                 return
             }
             if (currentState == STATE_PARKED) {
-                val result = delegator.wake(atomicPtr.value)
+                initPtrIfAbsent()
+                val result = ParkingUtils.wake(atomicPtr.value)
                 if (result == 0) return
             }
+        }
+    }
+    
+    private fun initPtrIfAbsent() {
+        val ptrVal = atomicPtr.value
+        if (ptrVal == -1L) {
+            val currentPtr = ParkingUtils.createFutexPtr()
+            if (atomicPtr.compareAndSet(ptrVal, currentPtr)) return
+            ParkingUtils.manualDeallocate(currentPtr)
         }
     }
 }

@@ -1,31 +1,32 @@
-import kotlin.concurrent.AtomicInt
-import kotlin.concurrent.AtomicLong
+import kotlinx.atomicfu.AtomicInt
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicInteger
 
-class NativeMutex {
+class NativeMutexOnJvm {
     private val parkingQueue = ImprovedParkingQueue()
     private val owningThread = AtomicLong(-1)
-    private val state = AtomicInt(0)
-    private val holdCount = AtomicInt(0)
+    private val state = AtomicInteger(0)
+    private val holdCount = AtomicInteger(0)
 
 
     fun lock() {
         val currentThreadId = currentThreadId()
         // Has to be checked in this order!
         // Is reentring thread 
-        if (holdCount.value > 0 && currentThreadId == owningThread.value) {
+        if (holdCount.get() > 0 && currentThreadId == owningThread.get()) {
             holdCount.incrementAndGet()
             return
         }
-        
+
         // Other wise try acquire lock
         val newState = state.incrementAndGet()
         // If new state 1 than I have acquired lock skipping queue.
         if (newState == 1) {
-            owningThread.value = currentThreadId
+            owningThread.set(currentThreadId)
             holdCount.incrementAndGet()
             return
         }
-        
+
         // If state larger than 1 -> enqueue and park
         // When woken up thread has acquired lock and his node in the queue is therefore at the head.
         // Remove head
@@ -33,7 +34,7 @@ class NativeMutex {
             val prevNode = parkingQueue.enqueue()
             prevNode.parker.park()
             parkingQueue.dequeue()
-            owningThread.value = currentThreadId
+            owningThread.set(currentThreadId)
             holdCount.incrementAndGet()
             return
         }
@@ -41,9 +42,9 @@ class NativeMutex {
 
     fun unlock() {
         val currentThreadId = currentThreadId()
-        val currentOwnerId = owningThread.value
+        val currentOwnerId = owningThread.get()
         if (currentThreadId != currentOwnerId) throw IllegalStateException("Thread is not holding the lock")
-        
+
         // dec hold count
         val newHoldCount = holdCount.decrementAndGet()
         if (newHoldCount > 0) return
@@ -52,7 +53,7 @@ class NativeMutex {
         // Lock is released by decrementing (only if decremented to 0)
         val currentState = state.decrementAndGet()
         if (currentState == 0) return
-        
+
         // If waiters wake up the first in line. The woken up thread will dequeue the node.
         if (currentState > 0) {
             val nextParker = parkingQueue.getHead()
@@ -62,12 +63,12 @@ class NativeMutex {
     }
 
     fun isLocked(): Boolean {
-        return state.value > 0
+        return state.get() > 0
     }
-    
+
     fun tryLock(): Boolean {
         if (state.compareAndSet(0, 1)) {
-            owningThread.value = currentThreadId()
+            owningThread.set(currentThreadId())
             return true
         }
         return false

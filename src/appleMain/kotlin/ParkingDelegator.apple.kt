@@ -3,7 +3,7 @@ import platform.darwin.UInt32
 import platform.darwin.UInt64Var
 
 @OptIn(ExperimentalForeignApi::class)
-actual class ParkingDelegator {
+actual object ParkingUtils {
     actual fun createFutexPtr(): Long {
         val signal = nativeHeap.alloc<UInt64Var>()
         signal.value = 0u
@@ -19,6 +19,11 @@ actual class ParkingDelegator {
 
     actual fun wake(futexPrt: Long): Int {
         return platform.darwin.ulock.__ulock_wake(UL_COMPARE_AND_WAIT, futexPrt.toCPointer<UInt64Var>(), 0u)
+    }
+
+    actual fun manualDeallocate(futexPrt: Long) {
+        val cPointer = futexPrt.toCPointer<UInt64Var>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
+        nativeHeap.free(cPointer)
     }
 }
 const val UL_COMPARE_AND_WAIT: UInt32 = 1u

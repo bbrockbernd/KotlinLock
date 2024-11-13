@@ -5,7 +5,7 @@ import platform.windows.WaitOnAddress
 import platform.windows.WakeByAddressSingle
 
 @OptIn(ExperimentalForeignApi::class)
-actual class ParkingDelegator actual constructor() {
+actual object ParkingUtils {
     actual fun createFutexPtr(): Long {
         val signal = nativeHeap.alloc<UINT64Var>()
         signal.value = 0u
@@ -34,5 +34,10 @@ actual class ParkingDelegator actual constructor() {
         WakeByAddressSingle(futexPrt.toCPointer<UINT64Var>())
         // windows doesn't return a success or fail status.
         return 0
+    }
+
+    actual fun manualDeallocate(futexPrt: Long) {
+        val cPtr = futexPrt.toCPointer<UINT64Var>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
+        nativeHeap.free(cPtr)
     }
 }
