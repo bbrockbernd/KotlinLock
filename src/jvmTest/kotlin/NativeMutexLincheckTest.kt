@@ -2,7 +2,7 @@ import org.jetbrains.kotlinx.lincheck.LoggingLevel
 import org.jetbrains.kotlinx.lincheck.annotations.Operation
 import org.jetbrains.kotlinx.lincheck.check
 import org.jetbrains.kotlinx.lincheck.strategy.managed.modelchecking.ModelCheckingOptions
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.Ignore
 
 class NativeMutexLincheckTest {

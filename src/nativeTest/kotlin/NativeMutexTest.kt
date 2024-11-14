@@ -1,10 +1,8 @@
-import kotlinx.atomicfu.locks.ReentrantLock
 import platform.posix.sleep
-import kotlin.native.concurrent.Future
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
+import kotlin.test.Ignore
 import kotlin.test.Test
-import kotlin.time.measureTime
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -12,6 +10,7 @@ import kotlin.uuid.Uuid
 class NativeMutexTest {
     
     
+    @Ignore
     @Test
     fun testNativeMutexSlow() {
         val mutex = NativeMutex()

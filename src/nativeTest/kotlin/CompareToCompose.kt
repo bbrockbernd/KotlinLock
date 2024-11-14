@@ -53,7 +53,7 @@ class CompareToCompose {
     }
 
     fun mulitTestLock(lockInt: SyncInt) {
-        val nThreads = 2
+        val nThreads = 5
         val countTo = 100000
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->

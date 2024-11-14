@@ -1,6 +1,5 @@
 import kotlinx.cinterop.*
-import platform.posix.pthread_create
-import platform.posix.pthread_tVar
+import platform.posix.*
 import kotlin.test.Test
 
 @OptIn(ExperimentalForeignApi::class)
@@ -11,7 +10,9 @@ class KilledThreadTest {
         memScoped { 
             val pthread = alloc<pthread_tVar>()
             pthread_create(pthread.ptr, null, staticCFunction(::threadFun) , null)
+//            pthread_kill(pthread.value, 9)
             
+            pthread_join(pthread.value, null)
             println("Done")
         }
         
@@ -22,6 +23,7 @@ class KilledThreadTest {
 
 @OptIn(ExperimentalForeignApi::class)
 private fun threadFun(arg: COpaquePointer?): COpaquePointer? {
+    sleep(5u)
     println(" Joe")
     return null
 }
