@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
     kotlin("multiplatform") version "2.0.21"
     id("org.jetbrains.kotlinx.atomicfu") version "0.26.0"
@@ -52,12 +50,7 @@ kotlin {
         jvmTest.dependencies {
             implementation("org.jetbrains.kotlinx:lincheck:2.34")
         }
-        appleMain.dependencies {}
-        
     }
-    
-    
-    
 }
 
 repositories {
