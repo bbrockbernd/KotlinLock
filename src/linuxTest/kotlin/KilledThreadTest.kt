@@ -17,11 +17,11 @@ class KilledThreadTest {
         
     }
     
-    private fun threadFun(arg: COpaquePointer?): COpaquePointer? {
-        println(" Joe")
-        return null
-    }
     
-    
-    
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun threadFun(arg: COpaquePointer?): COpaquePointer? {
+    println(" Joe")
+    return null
 }

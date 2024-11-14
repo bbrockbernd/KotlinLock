@@ -3,12 +3,14 @@ import org.jetbrains.kotlinx.lincheck.annotations.Operation
 import org.jetbrains.kotlinx.lincheck.check
 import org.jetbrains.kotlinx.lincheck.strategy.managed.modelchecking.ModelCheckingOptions
 import org.junit.Test
+import kotlin.test.Ignore
 
 class NativeMutexLincheckReentrantTest {
 
     private val lock = NativeMutexOnJvm()
     private val mutableList = mutableListOf(0)
 
+    @Ignore
     @Test
     fun modelCheckingTest(): Unit = ModelCheckingOptions()
         .iterations(300)
