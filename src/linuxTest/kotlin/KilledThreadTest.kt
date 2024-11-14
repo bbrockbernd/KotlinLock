@@ -11,8 +11,19 @@ class KilledThreadTest {
             val mutex = NativeMutex()
             val pthread = alloc<pthread_tVar>()
             val cRef = StableRef.create(mutex).asCPointer()
+            
+            mutex.lock()
+            println("[MAIN] Entered mutex")
             pthread_create(pthread.ptr, null, staticCFunction(::threadFun), cRef)
 //            pthread_kill(pthread.value, 9)
+
+
+            sleep(2u)
+            println("[MAIN] Exiting mutex")
+            mutex.unlock()
+
+            
+            
             
             pthread_join(pthread.value, null)
             println("Done")
@@ -27,8 +38,9 @@ class KilledThreadTest {
 private fun threadFun(arg: COpaquePointer?): COpaquePointer? {
     val mutex = arg!!.asStableRef<NativeMutex>().get()
     mutex.lock()
-    sleep(5u)
+    println("[SUB] Entered mutex")
+    
+    println("[SUB] Exiting mutex")
     mutex.unlock()
-    println(" Joe")
     return null
 }
