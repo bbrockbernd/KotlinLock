@@ -15,6 +15,8 @@ class KilledThreadTest {
             mutex.lock()
             println("[MAIN] Entered mutex")
             pthread_create(pthread.ptr, null, staticCFunction(::threadFun), cRef)
+            sleep(2u)
+            println("[MAIN] Killing SUB")
 //            pthread_kill(pthread.value, 9)
 
 
