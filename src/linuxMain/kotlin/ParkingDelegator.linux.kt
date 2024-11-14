@@ -20,7 +20,7 @@ actual object ParkingUtils {
         val cPtr = futexPrt.toCPointer<UIntVar>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
         val result = syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAIT, 0u, NULL)
         val interrupted = result.toInt() == EINTR
-        notifyWake(interrupted)
+        notifyWake(false)
         nativeHeap.free(cPtr)
     }
 
