@@ -10,10 +10,11 @@ actual object ParkingUtils {
         return signal.ptr.toLong()
     }
 
-    actual fun wait(futexPrt: Long, notifyWake: (Int) -> Unit) {
+    actual fun wait(futexPrt: Long, notifyWake: (interrupted: Boolean) -> Unit) {
         val cPointer = futexPrt.toCPointer<UInt64Var>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
         val result = platform.darwin.ulock.__ulock_wait(UL_COMPARE_AND_WAIT, cPointer, 0u, 0u)
-        notifyWake(result)
+        // TODO check thread interrupts on darwin
+        notifyWake(false)
         nativeHeap.free(cPointer)
     }
 

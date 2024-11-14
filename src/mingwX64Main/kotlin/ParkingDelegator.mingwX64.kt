@@ -13,7 +13,7 @@ actual object ParkingUtils {
     }
 
     // From https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitonaddress
-    actual fun wait(futexPrt: Long, notifyWake: (result: Int) -> Unit) {
+    actual fun wait(futexPrt: Long, notifyWake: (interrupted: Boolean) -> Unit) {
         val cPtr = futexPrt.toCPointer<UINT64Var>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
         
         val undesiredValue = nativeHeap.alloc<UINT64Var>()
@@ -24,7 +24,8 @@ actual object ParkingUtils {
             result = WaitOnAddress(cPtr, undesiredValue.ptr, 8u, INFINITE)
             capturedValue = cPtr.pointed.value.toInt()
         }
-        notifyWake(result)
+        // TODO check thread interrupts on windows
+        notifyWake(false)
         
         nativeHeap.free(undesiredValue)
         nativeHeap.free(cPtr)
