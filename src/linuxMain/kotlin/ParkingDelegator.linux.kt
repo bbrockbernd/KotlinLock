@@ -1,5 +1,6 @@
 import kotlinx.cinterop.*
 import platform.linux.SYS_futex
+import platform.posix.EINTR
 import platform.posix.NULL
 import platform.posix.syscall
 
@@ -15,10 +16,11 @@ actual object ParkingUtils {
         return signal.ptr.toLong()
     }
 
-    actual fun wait(futexPrt: Long, notifyWake: (Int) -> Unit) {
+    actual fun wait(futexPrt: Long, notifyWake: (Boolean) -> Unit) {
         val cPtr = futexPrt.toCPointer<UIntVar>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
         val result = syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAIT, 0u, NULL)
-        notifyWake(result.toInt())
+        val interrupted = result.toInt() == EINTR
+        notifyWake(interrupted)
         nativeHeap.free(cPtr)
     }
 

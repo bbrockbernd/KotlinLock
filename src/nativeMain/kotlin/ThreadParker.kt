@@ -14,7 +14,8 @@ actual class ThreadParker {
             if (currentState == STATE_FREE) {
                 if (!state.compareAndSet(currentState, STATE_PARKED)) continue
                 initPtrIfAbsent()
-                ParkingUtils.wait(atomicPtr.value) { res ->
+                ParkingUtils.wait(atomicPtr.value) { interrupted ->
+                    if (interrupted) throw InterruptedException("Thread was interrupted")
                     state.value = STATE_FREE
                     atomicPtr.value = -1L
                 }
