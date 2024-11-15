@@ -1,4 +1,4 @@
-expect fun currentThreadId(): Long 
+internal expect fun currentThreadId(): Long 
 
 
 

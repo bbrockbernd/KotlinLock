@@ -24,7 +24,7 @@ class VaryingContentionTest {
     }
 
     
-    fun mulitTestLock(lockInt: LockInt, nThreads: Int, countTo: Int) {
+    fun mulitTestLock(lockInt: NewLockInt2, nThreads: Int, countTo: Int) {
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->
             val test = LockIntTest(lockInt, countTo, nThreads, i)
@@ -51,61 +51,25 @@ class VaryingContentionTest {
     }
     
     data class LockIntTest(
-        val lockInt: LockInt,
+        val lockInt: NewLockInt2,
         val max: Int,
         val mod: Int,
         val id: Int,
     )
     
-    class NewLockInt2: LockInt{
-        private val lock = NativeMutex()
+    class NewLockInt2{
+        private val lock = NativeMutex { NativeParkingDelegator }
         private val check = AtomicInt(0)
-        override var n = 0
-        override fun lock() {
+        var n = 0
+        fun lock() {
             lock.lock()
             assertTrue(check.incrementAndGet() == 1)
         }
         
-        override fun unlock() {
+        fun unlock() {
             assertTrue(check.decrementAndGet() == 0)
             lock.unlock()
         }
         
-    }
-
-    class NewLockInt: LockInt{
-        private val lock = NativeMutex()
-        override var n = 0
-        private val check = AtomicInt(0)
-        override fun lock() {
-            lock.lock()
-            assertTrue(check.incrementAndGet() == 1)
-        }
-
-        override fun unlock() {
-            assertTrue(check.decrementAndGet() == 0)
-            lock.unlock()
-        }
-    }
-
-    class OldLockInt: LockInt {
-        private val lock = ReentrantLock()
-        override var n = 0
-        private val check = AtomicInt(0)
-        override fun lock() {
-            lock.lock()
-            assertTrue(check.incrementAndGet() == 1)
-        }
-
-        override fun unlock() {
-            assertTrue(check.decrementAndGet() == 0)
-            lock.unlock()
-        }
-    }
-
-    interface LockInt {
-        fun lock()
-        fun unlock()
-        var n: Int
     }
 }

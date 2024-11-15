@@ -29,7 +29,8 @@ class CompareToCompose {
     }
     
     fun singleTNew2() {
-        val nativeMutex = NativeMutex()
+        val nativeMutex = NativeMutex { NativeParkingDelegator }
+//        val nativeMutex = Mutex()
         repeat(1000000) {
             nativeMutex.lock()
             nativeMutex.unlock()
@@ -53,7 +54,7 @@ class CompareToCompose {
     }
 
     fun mulitTestLock(lockInt: SyncInt) {
-        val nThreads = 5
+        val nThreads = 2
         val countTo = 100000
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->
@@ -94,7 +95,7 @@ class CompareToCompose {
     }
 
     class NewSyncInt(): SyncInt {
-        private val lock = NativeMutex()
+        private val lock = Mutex()
         override var n = 0
         override fun synchronized(block: () -> Unit) {
             lock.lock()

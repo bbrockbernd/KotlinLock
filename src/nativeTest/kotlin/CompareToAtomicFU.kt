@@ -5,6 +5,9 @@ import kotlin.native.concurrent.Worker
 import kotlin.test.Test
 import kotlin.time.measureTime
 
+/**
+ * Compares to the atomicfu implementation.
+ */
 class CompareToAtomicFU {
     @Test
     fun compareWithAtomicFUSingleThread() {
@@ -38,7 +41,7 @@ class CompareToAtomicFU {
     }
 
     fun singleTNew() {
-        val nativeMutex = NativeMutex()
+        val nativeMutex = NativeMutex { NativeParkingDelegator }
         repeat(1000000) {
             nativeMutex.lock()
             nativeMutex.unlock()
@@ -89,7 +92,7 @@ class CompareToAtomicFU {
     )
 
     class NewLockInt: LockInt{
-        private val lock = NativeMutex()
+        private val lock = NativeMutex { NativeParkingDelegator }
         override var n = 0
         override fun lock() = lock.lock()
         override fun unlock() = lock.unlock()

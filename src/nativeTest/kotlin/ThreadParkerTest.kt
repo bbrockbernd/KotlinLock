@@ -14,7 +14,7 @@ class ThreadParkerTest {
         currentThreadId()
         println("Started Main: ${currentThreadId()}")
 
-        val peter = ThreadParker()
+        val peter = ThreadParker(NativeParkingDelegator)
 
         val worker = Worker.start()
         worker.execute(TransferMode.UNSAFE, { peter }) { p ->
@@ -39,7 +39,7 @@ class ThreadParkerTest {
         currentThreadId()
         println("Started Main: ${currentThreadId()}")
 
-        val peter = ThreadParker()
+        val peter = ThreadParker(NativeParkingDelegator)
 
         val worker = Worker.start()
         worker.execute(TransferMode.UNSAFE, { peter }) { p ->
@@ -67,7 +67,7 @@ class ThreadParkerTest {
             
         println("Starting test")
         val time1 = measureTime { 
-            val peter = ThreadParker()
+            val peter = ThreadParker(NativeParkingDelegator)
             val wrapper: MutablePair<ThreadParker, Boolean> = MutablePair(peter, false)
             val worker = Worker.start()
             worker.execute(TransferMode.SAFE, { wrapper }) { w ->

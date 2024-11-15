@@ -7,7 +7,7 @@ import kotlin.test.Ignore
 
 class NativeMutexLincheckReentrantTest {
 
-    private val lock = NativeMutexOnJvm()
+    private val lock = NativeMutex {JvmParkingDelegator()}
     private val mutableList = mutableListOf(0)
 
     @Ignore

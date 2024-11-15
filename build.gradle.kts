@@ -17,6 +17,7 @@ kotlin {
         macosX64(),
         macosArm64()
     )
+    
     appleTargets.forEach {
         it.compilations.getByName("main").cinterops {
             val ulock by creating {
@@ -24,14 +25,10 @@ kotlin {
                 packageName = "platform.darwin.ulock"
                 includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
             }
-            val stdatomic by creating {
-                defFile(project.file("src/nativeInterop/cinterop/stdatomic.def"))
-                packageName = "platform.darwin.stdatomic"
-            }
         }
     }
 
-    mingwX64() {
+    mingwX64 {
         binaries.all {
             linkerOpts += "-lSynchronization"
         }
