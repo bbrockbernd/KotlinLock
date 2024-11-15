@@ -12,9 +12,10 @@ actual object ParkingUtils {
 
     actual fun wait(futexPrt: Long, notifyWake: (interrupted: Boolean) -> Unit) {
         val cPointer = futexPrt.toCPointer<UInt64Var>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
+        // THere is very little information about ulock so not sure what returned int stands for an interrupt
+        // In any case it should be 0
         val result = platform.darwin.ulock.__ulock_wait(UL_COMPARE_AND_WAIT, cPointer, 0u, 0u)
-        // TODO check thread interrupts on darwin
-        notifyWake(false)
+        notifyWake(result != 0)
         nativeHeap.free(cPointer)
     }
 

@@ -14,9 +14,10 @@ actual class ThreadParker {
             if (currentState == STATE_FREE) {
                 if (!state.compareAndSet(currentState, STATE_PARKED)) continue
                 initPtrIfAbsent()
+                // TODO is this notifyWake lambda really needed?? what about a return..
                 ParkingUtils.wait(atomicPtr.value) { interrupted ->
                     if (interrupted) {
-                        println("THROWING")
+                        
                         throw InterruptedException("Thread was interrupted")
                     }
                     state.value = STATE_FREE

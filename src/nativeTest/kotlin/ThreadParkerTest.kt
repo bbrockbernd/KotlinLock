@@ -85,8 +85,8 @@ class ThreadParkerTest {
         }
         println(time1)
     }
-    
+
+    class MutablePair<A, B>(var first: A, var second: B)
     
 }
 
-class MutablePair<A, B>(var first: A, var second: B)
