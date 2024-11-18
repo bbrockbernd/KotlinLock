@@ -8,7 +8,16 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
-    val linuxTargets = listOf(linuxX64())
+    val linuxTargets = listOf(
+        linuxX64 {
+            compilations.getByName("main").cinterops {
+                val ulock by creating {
+                    defFile(project.file("stub.def"))
+                    packageName = "stub"
+                }
+            }
+        }
+    )
 
     // apple targets
     val appleTargets = listOf (
@@ -31,6 +40,12 @@ kotlin {
     mingwX64 {
         binaries.all {
             linkerOpts += "-lSynchronization"
+        }
+        compilations.getByName("main").cinterops {
+            val ulock by creating {
+                defFile(project.file("stub.def"))
+                packageName = "stub"
+            }
         }
     }
     
