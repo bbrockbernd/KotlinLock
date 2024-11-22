@@ -21,7 +21,7 @@ internal actual object NativeParkingDelegator: ParkingDelegator {
         val result = syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAIT, 0u, NULL)
         val interrupted = result.toInt() == EINTR
         nativeHeap.free(cPtr)
-        return interrupted
+        return false
     }
 
     actual override fun wake(futexPrt: Long): Int {
