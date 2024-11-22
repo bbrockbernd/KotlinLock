@@ -58,7 +58,6 @@ internal class ThreadParker(private val delegator: ParkingDelegator) {
                     val result = delegator.wake(atomicPtr.value)
                     if (result == 0) return
                 }
-                
             }
         }
     }

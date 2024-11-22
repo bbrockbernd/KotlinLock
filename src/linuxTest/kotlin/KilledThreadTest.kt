@@ -18,7 +18,7 @@ class KilledThreadTest {
             sleep(2u)
             println("[MAIN] Killing SUB")
             
-            pthread_kill(pthread.value, 15)
+            pthread_kill(pthread.value, 2)
 
 
             sleep(2u)
