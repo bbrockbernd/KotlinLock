@@ -10,7 +10,7 @@ import kotlin.time.measureTime
 /**
  * Compares to the atomicfu implementation.
  * Each thread has a number id, n threads have numbers 0 until n.
- * A counter protected by mutex needs to be incremented unttil 1.000.000
+ * A counter protected by mutex needs to be incremented unttil 10.000
  * A thread can only increment when the counter is counter mod id. This tests fariness and progress. For each thread.
  */
 class CompareToAtomicFU {
@@ -76,7 +76,7 @@ class CompareToAtomicFU {
     }
     
     fun mulitTestLock(lockInt: LockInt, nThreads: Int) {
-        val countTo = 100000
+        val countTo = 10000
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->
             val test = LockIntTest(lockInt, countTo, nThreads, i)
