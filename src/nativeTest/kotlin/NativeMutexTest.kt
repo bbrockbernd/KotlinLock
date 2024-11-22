@@ -56,7 +56,7 @@ class NativeMutexTest {
 
         val worker1 = Worker.start()
         val fut1 = worker1.execute(TransferMode.UNSAFE, { Pair(resultList, mutex) }) { (rl, mutex) ->
-            repeat(30) { i ->
+            repeat(300000) { i ->
                 mutex.lock()
                 rl.add("a$i")
                 println("Locked  : A $i")
@@ -69,7 +69,7 @@ class NativeMutexTest {
 
         val worker2 = Worker.start()
         val fut2= worker2.execute(TransferMode.UNSAFE, { Pair(resultList, mutex) }) { (rl, mutex) ->
-            repeat(30) { i -> 
+            repeat(300000) { i -> 
                 mutex.lock()
                 rl.add("b$i")
                 println("Locked  : B $i")
@@ -80,7 +80,7 @@ class NativeMutexTest {
             println("B DONE")
         }
 
-        repeat(30) { i ->
+        repeat(300000) { i ->
             mutex.lock()
             resultList.add("c$i")
             println("Locked  : C $i")
