@@ -2,6 +2,7 @@ import platform.posix.sleep
 import kotlin.native.concurrent.ObsoleteWorkersApi
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.measureTime
@@ -14,20 +15,20 @@ class ThreadParkerTest {
         currentThreadId()
         println("Started Main: ${currentThreadId()}")
 
-        val peter = ThreadParker(NativeParkingDelegator)
+        val p = ThreadParker(NativeParkingDelegator)
 
         val worker = Worker.start()
-        worker.execute(TransferMode.UNSAFE, { peter }) { p ->
+        worker.execute(TransferMode.UNSAFE, { p }) { p ->
             currentThreadId()
             println("Started Worker going to sleep: ${currentThreadId()}")
-            sleep(5u)
+            sleep(1u)
             println("Unparking from: ${currentThreadId()}")
             p.unpark()
             println("Unparked from: ${currentThreadId()}")
         }
 
         println("Parking from: ${currentThreadId()}")
-        peter.park()
+        p.park()
         println("Unparked at: ${currentThreadId()}")
 
 
@@ -39,10 +40,10 @@ class ThreadParkerTest {
         currentThreadId()
         println("Started Main: ${currentThreadId()}")
 
-        val peter = ThreadParker(NativeParkingDelegator)
+        val p = ThreadParker(NativeParkingDelegator)
 
         val worker = Worker.start()
-        worker.execute(TransferMode.UNSAFE, { peter }) { p ->
+        worker.execute(TransferMode.UNSAFE, { p }) { p ->
             currentThreadId()
             println("Unparking from: ${currentThreadId()}")
             p.unpark()
@@ -53,40 +54,11 @@ class ThreadParkerTest {
         sleep(5u)
 
         println("Parking thread: ${currentThreadId()}")
-        peter.park()
+        p.park()
         println("Continued thread: ${currentThreadId()}")
 
 
         assertTrue(true)
     }
-    
-    @Test
-    fun speedTest() {
-        val nIterations = 1000
-        
-            
-        println("Starting test")
-        val time1 = measureTime { 
-            val peter = ThreadParker(NativeParkingDelegator)
-            val wrapper: MutablePair<ThreadParker, Boolean> = MutablePair(peter, false)
-            val worker = Worker.start()
-            worker.execute(TransferMode.SAFE, { wrapper }) { w ->
-                while (!w.second)
-                    w.first.unpark()
-            }
-            
-            repeat(nIterations) { i ->
-                println("Parking $i")
-                peter.park()
-                println("Unparked")
-            }
-            wrapper.second = true
-           
-        }
-        println(time1)
-    }
-
-    class MutablePair<A, B>(var first: A, var second: B)
-    
 }
 

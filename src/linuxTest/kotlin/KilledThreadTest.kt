@@ -1,7 +1,10 @@
 import kotlinx.cinterop.*
 import platform.posix.*
+import kotlin.test.Ignore
 import kotlin.test.Test
 
+// Thread kill signal always crashes program before we can catch it..
+@Ignore
 @OptIn(ExperimentalForeignApi::class)
 class KilledThreadTest {
     

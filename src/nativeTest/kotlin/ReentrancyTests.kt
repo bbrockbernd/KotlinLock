@@ -10,7 +10,6 @@ class ReentrancyTests {
         lock.lock()
         lock.unlock()
         lock.unlock()
-        
     }
     
     @Test

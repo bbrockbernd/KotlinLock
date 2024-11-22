@@ -2,21 +2,26 @@ import kotlin.native.concurrent.Future
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
 import kotlin.test.Test
+import kotlin.test.assertTrue
+import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
 class CompareToCompose {
     @Test
     fun compareWithComposeSingleThread() {
+        var accumulatedDifference = 0L
         repeat(3) {
             val time1 = measureTime {
                 singleTComp()
             }
             println("Old $time1")
-            val time3 = measureTime {
+            val time2 = measureTime {
                 singleTNew2()
             }
-            println("New $time3")
+            println("New $time2")
+            accumulatedDifference += time1.toLong(DurationUnit.MILLISECONDS) - time2.toLong(DurationUnit.MILLISECONDS)
         }
+        assertTrue(accumulatedDifference > 0)
     }
 
     fun singleTComp() {
@@ -30,31 +35,40 @@ class CompareToCompose {
     
     fun singleTNew2() {
         val nativeMutex = NativeMutex { NativeParkingDelegator }
-//        val nativeMutex = Mutex()
         repeat(1000000) {
             nativeMutex.lock()
             nativeMutex.unlock()
         }
     }
+    
+    @Test
+    fun compareCompose3Threads() = compareComposeMultiThread(3)
 
     @Test
-    fun compareComposeMultiThread() {
+    fun compareCompose5Threads() = compareComposeMultiThread(5)
+    
+    @Test
+    fun compareCompose7Threads() = compareComposeMultiThread(7)
+
+    fun compareComposeMultiThread(nThreads: Int) {
+        var accumulatedDifference = 0L
         repeat(3) {
             val timeNew = measureTime {
                 val newLock = NewSyncInt()
-                mulitTestLock(newLock)
+                mulitTestLock(newLock, nThreads)
             }
             println("New $timeNew")
             val timeOld = measureTime {
                 val oldLock = OldSyncInt()
-                mulitTestLock(oldLock)
+                mulitTestLock(oldLock, nThreads)
             }
             println("Old $timeOld")
+            accumulatedDifference += timeOld.toLong(DurationUnit.MILLISECONDS) - timeNew.toLong(DurationUnit.MILLISECONDS)
         }
+        assertTrue(accumulatedDifference > 0)
     }
 
-    fun mulitTestLock(lockInt: SyncInt) {
-        val nThreads = 2
+    fun mulitTestLock(lockInt: SyncInt, nThreads: Int) {
         val countTo = 100000
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->
@@ -109,4 +123,10 @@ class CompareToCompose {
         var n: Int
     }
 
+}
+
+@Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+class CompLock {
+    private val syncObj = androidx.compose.runtime.SynchronizedObject()
+    fun synchronized(block: () -> Unit) = androidx.compose.runtime.synchronized(syncObj, block)
 }

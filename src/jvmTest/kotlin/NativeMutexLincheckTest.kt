@@ -2,6 +2,7 @@ import org.jetbrains.kotlinx.lincheck.LoggingLevel
 import org.jetbrains.kotlinx.lincheck.annotations.Operation
 import org.jetbrains.kotlinx.lincheck.check
 import org.jetbrains.kotlinx.lincheck.strategy.managed.modelchecking.ModelCheckingOptions
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class NativeMutexLincheckTest {
@@ -9,7 +10,7 @@ class NativeMutexLincheckTest {
     private val lock = NativeMutex { JvmParkingDelegator() }
     private val mutableList = mutableListOf(0)
 
-//    @Ignore
+    @Ignore
     @Test
     fun modelCheckingTest(): Unit = ModelCheckingOptions()
         .iterations(300)

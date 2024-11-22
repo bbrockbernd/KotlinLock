@@ -3,14 +3,20 @@ import kotlin.native.concurrent.Future
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
 import kotlin.test.Test
+import kotlin.test.assertTrue
+import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
 /**
  * Compares to the atomicfu implementation.
+ * Each thread has a number id, n threads have numbers 0 until n.
+ * A counter protected by mutex needs to be incremented unttil 1.000.000
+ * A thread can only increment when the counter is counter mod id. This tests fariness and progress. For each thread.
  */
 class CompareToAtomicFU {
     @Test
     fun compareWithAtomicFUSingleThread() {
+        var accumulatedDifference = 0L
         repeat(3) {
             val time1 = measureTime {
                 singleTOld()
@@ -20,24 +26,37 @@ class CompareToAtomicFU {
                 singleTNew()
             }
             println("New $time2")
+            accumulatedDifference += time1.toLong(DurationUnit.MILLISECONDS) - time2.toLong(DurationUnit.MILLISECONDS)
         }
+        assertTrue(accumulatedDifference > 0)
     }
+
+    @Test
+    fun compareAtomicFU3Threads() = compareAtomicFUMultiThread(3)
     
     @Test
-    fun compareAtomicFUMultiThread() {
+    fun compareAtomicFU5Threads() = compareAtomicFUMultiThread(5)
+    
+    @Test
+    fun compareAtomicFU7Threads() = compareAtomicFUMultiThread(7)
+    
+    fun compareAtomicFUMultiThread(nThreads: Int) {
+        var accumulatedDifference = 0L
         repeat(3) {
             val timeNew = measureTime {
                 val newLock = NewLockInt()
-                mulitTestLock(newLock)
+                mulitTestLock(newLock, nThreads)
             }
             println("New $timeNew")
             
             val timeOld = measureTime {
                 val oldLock = OldLockInt()
-                mulitTestLock(oldLock)
+                mulitTestLock(oldLock, nThreads)
             }
             println("Old $timeOld")
+            accumulatedDifference += timeOld.toLong(DurationUnit.MILLISECONDS) - timeNew.toLong(DurationUnit.MILLISECONDS)
         }
+        assertTrue(accumulatedDifference > 0)
     }
 
     fun singleTNew() {
@@ -56,8 +75,7 @@ class CompareToAtomicFU {
         }
     }
     
-    fun mulitTestLock(lockInt: LockInt) {
-        val nThreads = 5
+    fun mulitTestLock(lockInt: LockInt, nThreads: Int) {
         val countTo = 100000
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->
