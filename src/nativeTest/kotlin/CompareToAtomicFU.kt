@@ -76,7 +76,7 @@ class CompareToAtomicFU {
     }
     
     fun mulitTestLock(lockInt: LockInt, nThreads: Int) {
-        val countTo = 10000
+        val countTo = 100000
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->
             val test = LockIntTest(lockInt, countTo, nThreads, i)
