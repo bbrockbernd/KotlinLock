@@ -28,9 +28,9 @@ internal actual object NativeParkingDelegator: ParkingDelegator {
 
     actual override fun wake(futexPrt: Long): Int {
         println("__Waking: ${futexPrt % 100}")
-        val bla = syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAKE, 1u, NULL).toInt()
-        println("__Wake result: $bla")
-        return bla
+        //Returns n threads woken up (needs to be 1)
+        val result = syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAKE, 1u, NULL).toInt()
+        return if (result == 1) 0 else -1
     }
 
     actual override fun manualDeallocate(futexPrt: Long) {
