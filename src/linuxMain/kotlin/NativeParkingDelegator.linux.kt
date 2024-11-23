@@ -20,7 +20,7 @@ internal actual object NativeParkingDelegator: ParkingDelegator {
         println("Wait on: ${futexPrt % 100}")
         val cPtr = futexPrt.toCPointer<UIntVar>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
         val result = syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAIT, 0u, NULL)
-        println("Woken up on: ${futexPrt % 100}")
+        println("Woken up on: ${futexPrt % 100} with result: $result")
         val interrupted = result.toInt() == EINTR
         nativeHeap.free(cPtr)
         return interrupted
