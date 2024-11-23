@@ -109,7 +109,7 @@ class CompareToCompose {
     }
 
     class NewSyncInt(): SyncInt {
-        private val lock = Mutex()
+        private val lock = NativeMutex { NativeParkingDelegator }
         override var n = 0
         override fun synchronized(block: () -> Unit) {
             lock.lock()
