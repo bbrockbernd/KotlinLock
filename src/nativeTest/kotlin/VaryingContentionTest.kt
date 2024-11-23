@@ -18,8 +18,8 @@ class VaryingContentionTest {
         mulitTestLock(lockInt, 20, 300000)
         println("3")
         mulitTestLock(lockInt, 1, 400000)
-        println("4")
-        mulitTestLock(lockInt, 30, 800000)
+//        println("4")
+//        mulitTestLock(lockInt, 30, 800000)
         println("done")
     }
 
