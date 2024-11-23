@@ -17,18 +17,20 @@ internal actual object NativeParkingDelegator: ParkingDelegator {
     }
 
     actual override fun wait(futexPrt: Long): Boolean {
-        println("Wait on: ${futexPrt % 100}")
+        println("__Wait on: ${futexPrt % 100}")
         val cPtr = futexPrt.toCPointer<UIntVar>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
         val result = syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAIT, 0u, NULL)
-        println("Woken up on: ${futexPrt % 100} with result: $result")
+        println("__Woken up on: ${futexPrt % 100} with result: $result")
         val interrupted = result.toInt() == EINTR
         nativeHeap.free(cPtr)
         return interrupted
     }
 
     actual override fun wake(futexPrt: Long): Int {
-        println("Waking: ${futexPrt % 100}")
-        return syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAKE, 1u, NULL).toInt()
+        println("__Waking: ${futexPrt % 100}")
+        val bla = syscall(SYS_futex.toLong(), futexPrt, FUTEX_WAKE, 1u, NULL).toInt()
+        println("__Wake result: $bla")
+        return bla
     }
 
     actual override fun manualDeallocate(futexPrt: Long) {
