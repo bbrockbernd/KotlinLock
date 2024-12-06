@@ -7,7 +7,7 @@ import kotlin.time.measureTime
 
 class ComparePosixParkingToFutex{
     @Test
-    fun compareWithAtomicFUSingleThread() {
+    fun compareSingleThreadedPosixVsFutexParking() {
         var accumulatedDifference = 0L
         repeat(3) {
             val time1 = measureTime {
@@ -24,15 +24,15 @@ class ComparePosixParkingToFutex{
     }
 
     @Test
-    fun compareAtomicFU3Threads() = compareAtomicFUMultiThread(3)
+    fun comparePosFut3() = comparePosixFutexParking(3)
 
     @Test
-    fun compareAtomicFU5Threads() = compareAtomicFUMultiThread(5)
+    fun comparePosFut5() = comparePosixFutexParking(5)
 
     @Test
-    fun compareAtomicFU7Threads() = compareAtomicFUMultiThread(7)
+    fun comparePosFut7() = comparePosixFutexParking(7)
 
-    fun compareAtomicFUMultiThread(nThreads: Int) {
+    fun comparePosixFutexParking(nThreads: Int) {
         var accumulatedDifference = 0L
         repeat(3) {
             val timeNew = measureTime {
