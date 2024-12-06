@@ -15,6 +15,11 @@ kotlin {
                     defFile(project.file("stub.def"))
                     packageName = "stub"
                 }
+                val posixcombo by creating {
+                    defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
+                    packageName = "platform.posix"
+//                    includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
+                }
             }
         }
     )
@@ -34,6 +39,11 @@ kotlin {
                 packageName = "platform.darwin.ulock"
                 includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
             }
+            val posixcombo by creating {
+                defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
+                packageName = "platform.posix"
+//                includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
+            }
         }
     }
 
@@ -45,6 +55,11 @@ kotlin {
             val ulock by creating {
                 defFile(project.file("stub.def"))
                 packageName = "stub"
+            }
+            val posixcombo by creating {
+                defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
+                packageName = "platform.posix"
+//                includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
             }
         }
     }

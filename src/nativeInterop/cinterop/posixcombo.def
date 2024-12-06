@@ -1,0 +1,7 @@
+headers = stdint.h pthread.h
+---
+typedef struct {
+    pthread_mutex_t mutex;
+    pthread_cond_t cond; 
+    uint64_t wake;
+} posix_combo_t;

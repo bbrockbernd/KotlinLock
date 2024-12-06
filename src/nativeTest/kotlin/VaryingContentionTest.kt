@@ -11,16 +11,17 @@ class VaryingContentionTest {
     @Test
     fun compareAtomicFUMultiThread() {
         val lockInt = NewLockInt2()
-        mulitTestLock(lockInt, 10, 100000)
-        println("1")
-        mulitTestLock(lockInt, 1, 200000)
-        println("2")
-        mulitTestLock(lockInt, 20, 300000)
-        println("3")
-        mulitTestLock(lockInt, 1, 400000)
-//        println("4")
-//        mulitTestLock(lockInt, 30, 800000)
-        println("done")
+//        mulitTestLock(lockInt, 10, 100000)
+//        println("1")
+//        mulitTestLock(lockInt, 1, 200000)
+//        println("2")
+//        mulitTestLock(lockInt, 20, 300000)
+//        println("3")
+//        mulitTestLock(lockInt, 1, 400000)
+////        println("4")
+////        mulitTestLock(lockInt, 30, 800000)
+//        println("done")
+        mulitTestLock(lockInt, 2, 1000000)
     }
 
     

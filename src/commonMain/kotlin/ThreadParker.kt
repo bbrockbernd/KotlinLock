@@ -8,7 +8,6 @@ import kotlinx.atomicfu.atomic
  * Or Darwin 16 (macOS 10.12, iOS 10.0, tvOS 10.0, and watchOS 3.0)
  * Or Windows 8 and Windows Server 2012
  */
-
 internal class ThreadParker(private val delegator: ParkingDelegator) {
     private val state = atomic(STATE_FREE)
     private val atomicPtr = atomic(-1L)

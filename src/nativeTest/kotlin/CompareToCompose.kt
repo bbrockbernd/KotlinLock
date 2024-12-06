@@ -1,11 +1,13 @@
 import kotlin.native.concurrent.Future
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
+//@Ignore
 class CompareToCompose {
     @Test
     fun compareWithComposeSingleThread() {
@@ -40,6 +42,9 @@ class CompareToCompose {
             nativeMutex.unlock()
         }
     }
+    
+    @Test
+    fun compareCompose2Threads() = compareComposeMultiThread(2)
     
     @Test
     fun compareCompose3Threads() = compareComposeMultiThread(3)

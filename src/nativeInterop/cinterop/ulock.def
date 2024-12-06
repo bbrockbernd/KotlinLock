@@ -1,1 +1,1 @@
-headers = stdint.h ulock.h
+headers = stdint.h pthread.h ulock.h
