@@ -15,12 +15,12 @@ internal actual object NativeParkingDelegator: ParkingDelegator {
 @OptIn(ExperimentalForeignApi::class)
 internal object PosixDelegator : ParkingDelegator {
     override fun createFutexPtr(): Long {
-        val combo = nativeHeap.alloc<posix_combo_t>()
+//        val combo = nativeHeap.alloc<posix_combo_t>()
 //        pthread_mutex_init(combo.mutex.ptr, null)
 //        pthread_cond_init(combo.cond.ptr, null)
 //        combo.wake = 0uL
-        posixParkInit(combo.ptr)
-        return combo.ptr.toLong()
+        val combo = posixParkInit()
+        return combo.toLong()
     }
 
     override fun wait(futexPrt: Long): Boolean {
@@ -36,7 +36,6 @@ internal object PosixDelegator : ParkingDelegator {
 //        pthread_mutex_destroy(combo.mutex.ptr)
 //        pthread_cond_destroy(combo.cond.ptr)
         posixWait(comboPtr)
-        nativeHeap.free(comboPtr)
         return false
     }
 
@@ -57,7 +56,6 @@ internal object PosixDelegator : ParkingDelegator {
 //        pthread_mutex_destroy(combo.mutex.ptr)
 //        pthread_cond_destroy(combo.cond.ptr)
         posixDestroy(comboPtr)
-        nativeHeap.free(comboPtr)
     }
 
 }

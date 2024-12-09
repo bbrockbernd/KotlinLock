@@ -1,15 +1,17 @@
-headers = stdint.h pthread.h
+headers = stdlib.h stdint.h pthread.h
 ---
 typedef struct {
     pthread_mutex_t mutex;
-    pthread_cond_t cond; 
+    pthread_cond_t cond;
     uint64_t wake;
 } posix_combo_t;
 
-void posixParkInit(posix_combo_t* pc) {
+posix_combo_t* posixParkInit() {
+    posix_combo_t* pc = malloc(sizeof(posix_combo_t));
     pthread_mutex_init(&pc->mutex, NULL);
     pthread_cond_init(&pc->cond, NULL);
     pc->wake = 0;
+    return pc;
 }
 
 void posixWait(posix_combo_t* pc) {
@@ -20,6 +22,7 @@ void posixWait(posix_combo_t* pc) {
     pthread_mutex_unlock(&pc->mutex);
     pthread_mutex_destroy(&pc->mutex);
     pthread_cond_destroy(&pc->cond);
+    free(pc);
 }
 
 void posixWake(posix_combo_t* pc) {
@@ -32,4 +35,6 @@ void posixWake(posix_combo_t* pc) {
 void posixDestroy(posix_combo_t* pc) {
     pthread_mutex_destroy(&pc->mutex);
     pthread_cond_destroy(&pc->cond);
+    free(pc);
 }
+

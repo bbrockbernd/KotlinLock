@@ -57,15 +57,13 @@ internal object FutexDelegator: ParkingDelegator {
 @OptIn(ExperimentalForeignApi::class)
 internal object PosixDelegator : ParkingDelegator {
     override fun createFutexPtr(): Long {
-        val combo = nativeHeap.alloc<posix_combo_t>()
-        posixParkInit(combo.ptr)
-        return combo.ptr.toLong()
+        val combo = posixParkInit()
+        return combo.toLong()
     }
 
     override fun wait(futexPrt: Long): Boolean {
         val comboPtr = futexPrt.toCPointer<posix_combo_t>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
         posixWait(comboPtr)
-        nativeHeap.free(comboPtr)
         return false
     }
 
@@ -78,6 +76,5 @@ internal object PosixDelegator : ParkingDelegator {
     override fun manualDeallocate(futexPrt: Long) {
         val comboPtr = futexPrt.toCPointer<posix_combo_t>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
         posixDestroy(comboPtr)
-        nativeHeap.free(comboPtr)
     }
 }
