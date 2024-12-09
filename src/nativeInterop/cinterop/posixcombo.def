@@ -5,3 +5,31 @@ typedef struct {
     pthread_cond_t cond; 
     uint64_t wake;
 } posix_combo_t;
+
+void posixParkInit(posix_combo_t* pc) {
+    pthread_mutex_init(&pc->mutex, NULL);
+    pthread_cond_init(&pc->cond, NULL);
+    pc->wake = 0;
+}
+
+void posixWait(posix_combo_t* pc) {
+    pthread_mutex_lock(&pc->mutex);
+    while(!pc->wake) {
+        pthread_cond_wait(&pc->cond, &pc->mutex);
+    }
+    pthread_mutex_unlock(&pc->mutex);
+    pthread_mutex_destroy(&pc->mutex);
+    pthread_cond_destroy(&pc->cond);
+}
+
+void posixWake(posix_combo_t* pc) {
+    pthread_mutex_lock(&pc->mutex);
+    pc->wake = 1;
+    pthread_cond_signal(&pc->cond);
+    pthread_mutex_unlock(&pc->mutex);
+}
+
+void posixDestroy(posix_combo_t* pc) {
+    pthread_mutex_destroy(&pc->mutex);
+    pthread_cond_destroy(&pc->cond);
+}

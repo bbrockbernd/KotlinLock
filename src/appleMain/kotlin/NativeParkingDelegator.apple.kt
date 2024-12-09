@@ -5,7 +5,7 @@ import platform.posix.*
 
 @OptIn(ExperimentalForeignApi::class)
 internal actual object NativeParkingDelegator: ParkingDelegator {
-    private val delegator = UlockDelegator
+    private val delegator = FutexDelegator
     actual override fun createFutexPtr(): Long = delegator.createFutexPtr()
     actual override fun wait(futexPrt: Long): Boolean = delegator.wait(futexPrt)
     actual override fun wake(futexPrt: Long): Int = delegator.wake(futexPrt)
@@ -16,43 +16,47 @@ internal actual object NativeParkingDelegator: ParkingDelegator {
 internal object PosixDelegator : ParkingDelegator {
     override fun createFutexPtr(): Long {
         val combo = nativeHeap.alloc<posix_combo_t>()
-        pthread_mutex_init(combo.mutex.ptr, null)
-        pthread_cond_init(combo.cond.ptr, null)
-        combo.wake = 0uL
+//        pthread_mutex_init(combo.mutex.ptr, null)
+//        pthread_cond_init(combo.cond.ptr, null)
+//        combo.wake = 0uL
+        posixParkInit(combo.ptr)
         return combo.ptr.toLong()
     }
 
     override fun wait(futexPrt: Long): Boolean {
         val comboPtr = futexPrt.toCPointer<posix_combo_t>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
-        val combo = comboPtr.pointed 
-        
-        pthread_mutex_lock(combo.mutex.ptr)
-        while (combo.wake == 0uL) {
-            pthread_cond_wait(combo.cond.ptr, combo.mutex.ptr)
-        }
-        pthread_mutex_unlock(combo.mutex.ptr)
-        
-        pthread_mutex_destroy(combo.mutex.ptr)
-        pthread_cond_destroy(combo.cond.ptr)
+//        val combo = comboPtr.pointed 
+//        
+//        pthread_mutex_lock(combo.mutex.ptr)
+//        while (combo.wake == 0uL) {
+//            pthread_cond_wait(combo.cond.ptr, combo.mutex.ptr)
+//        }
+//        pthread_mutex_unlock(combo.mutex.ptr)
+//        
+//        pthread_mutex_destroy(combo.mutex.ptr)
+//        pthread_cond_destroy(combo.cond.ptr)
+        posixWait(comboPtr)
         nativeHeap.free(comboPtr)
         return false
     }
 
     override fun wake(futexPrt: Long): Int {
         val comboPtr = futexPrt.toCPointer<posix_combo_t>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
-        val combo = comboPtr.pointed
-        pthread_mutex_lock(combo.mutex.ptr)
-        combo.wake = 1uL
-        pthread_cond_signal(combo.cond.ptr)
-        pthread_mutex_unlock(combo.mutex.ptr)
+//        val combo = comboPtr.pointed
+//        pthread_mutex_lock(combo.mutex.ptr)
+//        combo.wake = 1uL
+//        pthread_cond_signal(combo.cond.ptr)
+//        pthread_mutex_unlock(combo.mutex.ptr)
+        posixWake(comboPtr)
         return 0
     }
 
     override fun manualDeallocate(futexPrt: Long) {
         val comboPtr = futexPrt.toCPointer<posix_combo_t>() ?: throw IllegalStateException("Could not create C Pointer from futex ref")
-        val combo = comboPtr.pointed
-        pthread_mutex_destroy(combo.mutex.ptr)
-        pthread_cond_destroy(combo.cond.ptr)
+//        val combo = comboPtr.pointed
+//        pthread_mutex_destroy(combo.mutex.ptr)
+//        pthread_cond_destroy(combo.cond.ptr)
+        posixDestroy(comboPtr)
         nativeHeap.free(comboPtr)
     }
 
@@ -60,7 +64,7 @@ internal object PosixDelegator : ParkingDelegator {
 
 
 @OptIn(ExperimentalForeignApi::class)
-internal object UlockDelegator: ParkingDelegator {
+internal object FutexDelegator: ParkingDelegator {
     override fun createFutexPtr(): Long {
         val signal = nativeHeap.alloc<UInt64Var>()
         signal.value = 0u
