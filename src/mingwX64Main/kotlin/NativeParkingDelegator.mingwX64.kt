@@ -27,11 +27,11 @@ internal object FutexDelegator: ParkingDelegator {
 
         val undesiredValue = nativeHeap.alloc<UINT64Var>()
         undesiredValue.value = 0u
-        var capturedValue = cPtr.pointed.value.toInt()
+        var capturedValue = cPtr.pointed.value
         var result = 0
-        while (capturedValue == 0) {
+        while (capturedValue == 0uL) {
             result = WaitOnAddress(cPtr, undesiredValue.ptr, 8u, INFINITE)
-            capturedValue = cPtr.pointed.value.toInt()
+            capturedValue = cPtr.pointed.value
         }
 
         nativeHeap.free(undesiredValue)

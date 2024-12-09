@@ -35,16 +35,17 @@ class ComparePosixParkingToFutex{
     fun comparePosixFutexParking(nThreads: Int) {
         var accumulatedDifference = 0L
         repeat(3) {
-            val timeNew = measureTime {
-                val futexLock = FutexLockInt()
-                mulitTestLock(futexLock, nThreads)
-            }
-            println("Futex $timeNew")
 
             val timeOld = measureTime {
                 val posixLock = PosixLockInt()
                 mulitTestLock(posixLock, nThreads)
             }
+            
+            val timeNew = measureTime {
+                val futexLock = FutexLockInt()
+                mulitTestLock(futexLock, nThreads)
+            }
+            println("Futex $timeNew")
             println("Posix $timeOld")
             accumulatedDifference += timeOld.toLong(DurationUnit.MILLISECONDS) - timeNew.toLong(DurationUnit.MILLISECONDS)
         }
