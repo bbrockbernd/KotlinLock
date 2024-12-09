@@ -38,6 +38,7 @@ class ComparePosixParkingToFutex{
 
             val timeOld = measureTime {
                 val posixLock = PosixLockInt()
+                println("Starting test")
                 mulitTestLock(posixLock, nThreads)
             }
             println("Posix $timeOld")
