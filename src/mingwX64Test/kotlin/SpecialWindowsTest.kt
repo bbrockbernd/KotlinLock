@@ -1,6 +1,7 @@
 import kotlinx.cinterop.*
 import platform.posix.posix_combo_t
 import platform.posix.pthread_mutex_init
+import platform.posix.pthread_mutex_t
 import platform.posix.pthread_mutex_tVar
 import kotlin.test.Test
 
@@ -16,14 +17,13 @@ class SpecialWindowsTest {
         pthread_mutex_init(bla.ptr, null)
         println("mut initialized")
         
-        
-        
         // Here how we do it
-        println("Test 2 started")
-        val bla1 = nativeHeap.alloc<posix_combo_t>()
-        println("ptr 2 created")
-        pthread_mutex_init(bla1.mutex.toCPointer(), null)
-        println("mut 2 initialized")
+        println("Test 3 started")
+        val bla2 = nativeHeap.alloc<posix_combo_t>()
+        println("ptr 3 created")
+        val mutLongVar = LongVarOf<pthread_mutex_t>(bla2.mutex.objcPtr())
+        pthread_mutex_init(mutLongVar.ptr, null)
+        println("mut 3 initialized")
         
         
         
