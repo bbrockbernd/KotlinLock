@@ -15,7 +15,7 @@ class ThreadParkerTest {
         currentThreadId()
         println("Started Main: ${currentThreadId()}")
 
-        val p = ThreadParker(NativeParkingDelegator)
+        val p = ThreadParker(FutexParkingDelegator)
 
         val worker = Worker.start()
         worker.execute(TransferMode.UNSAFE, { p }) { p ->
@@ -40,7 +40,7 @@ class ThreadParkerTest {
         currentThreadId()
         println("Started Main: ${currentThreadId()}")
 
-        val p = ThreadParker(NativeParkingDelegator)
+        val p = ThreadParker(FutexParkingDelegator)
 
         val worker = Worker.start()
         worker.execute(TransferMode.UNSAFE, { p }) { p ->

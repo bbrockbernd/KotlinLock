@@ -18,7 +18,6 @@ kotlin {
                 val posixcombo by creating {
                     defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
                     packageName = "platform.posix"
-//                    includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
                 }
             }
         }
@@ -42,7 +41,6 @@ kotlin {
             val posixcombo by creating {
                 defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
                 packageName = "platform.posix"
-//                includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
             }
         }
     }
@@ -59,7 +57,6 @@ kotlin {
             val posixcombo by creating {
                 defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
                 packageName = "platform.posix"
-//                includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
             }
         }
     }

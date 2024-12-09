@@ -59,7 +59,7 @@ class VaryingContentionTest {
     )
     
     class NewLockInt2{
-        private val lock = NativeMutex { NativeParkingDelegator }
+        private val lock = NativeMutex { FutexParkingDelegator }
         private val check = AtomicInt(0)
         var n = 0
         fun lock() {

@@ -11,7 +11,7 @@ class KilledThreadTest {
     @Test
     fun threadKillTest() {
         memScoped { 
-            val mutex = NativeMutex { NativeParkingDelegator }
+            val mutex = NativeMutex { FutexParkingDelegator }
             val pthread = alloc<pthread_tVar>()
             val cRef = StableRef.create(mutex).asCPointer()
             
