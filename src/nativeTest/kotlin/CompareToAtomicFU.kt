@@ -2,7 +2,6 @@ import kotlinx.atomicfu.locks.ReentrantLock
 import kotlin.native.concurrent.Future
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.time.DurationUnit
@@ -14,7 +13,6 @@ import kotlin.time.measureTime
  * A counter protected by mutex needs to be incremented unttil 10.000
  * A thread can only increment when the counter is counter mod id. This tests fariness and progress. For each thread.
  */
-//@Ignore
 class CompareToAtomicFU {
     @Test
     fun compareWithAtomicFUSingleThread() {

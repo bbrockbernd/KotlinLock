@@ -54,7 +54,7 @@ class ComparePosixParkingToFutex{
     }
 
     fun posixTestSingle() {
-        val nativeMutex = NativeMutex { FutexDelegator }
+        val nativeMutex = NativeMutex { FutexParkingDelegator }
         repeat(1000000) {
             nativeMutex.lock()
             nativeMutex.unlock()
@@ -62,7 +62,7 @@ class ComparePosixParkingToFutex{
     }
 
     fun futexTestSingle() {
-        val nativeMutex = NativeMutex { PosixDelegator }
+        val nativeMutex = NativeMutex { PosixParkingDelegator }
         repeat(1000000) {
             nativeMutex.lock()
             nativeMutex.unlock()
@@ -104,14 +104,14 @@ class ComparePosixParkingToFutex{
     )
 
     class FutexLockInt: LockInt{
-        private val lock = NativeMutex { FutexDelegator }
+        private val lock = NativeMutex { FutexParkingDelegator }
         override var n = 0
         override fun lock() = lock.lock()
         override fun unlock() = lock.unlock()
     }
 
     class PosixLockInt: LockInt {
-        private val lock = NativeMutex { PosixDelegator }
+        private val lock = NativeMutex { PosixParkingDelegator }
         override var n = 0
         override fun lock() = lock.lock()
         override fun unlock() = lock.unlock()

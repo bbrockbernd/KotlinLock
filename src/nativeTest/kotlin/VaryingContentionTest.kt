@@ -1,4 +1,3 @@
-import kotlinx.atomicfu.locks.ReentrantLock
 import kotlin.concurrent.AtomicInt
 import kotlin.native.concurrent.Future
 import kotlin.native.concurrent.TransferMode
@@ -11,16 +10,14 @@ class VaryingContentionTest {
     @Test
     fun compareAtomicFUMultiThread() {
         val lockInt = NewLockInt2()
-//        mulitTestLock(lockInt, 10, 100000)
-//        println("1")
-//        mulitTestLock(lockInt, 1, 200000)
-//        println("2")
-//        mulitTestLock(lockInt, 20, 300000)
-//        println("3")
-//        mulitTestLock(lockInt, 1, 400000)
-////        println("4")
-////        mulitTestLock(lockInt, 30, 800000)
-//        println("done")
+        mulitTestLock(lockInt, 10, 100000)
+        println("1")
+        mulitTestLock(lockInt, 1, 200000)
+        println("2")
+        mulitTestLock(lockInt, 20, 300000)
+        println("3")
+        mulitTestLock(lockInt, 1, 400000)
+        println("done")
         mulitTestLock(lockInt, 2, 1000000)
     }
 
@@ -59,7 +56,7 @@ class VaryingContentionTest {
     )
     
     class NewLockInt2{
-        private val lock = NativeMutex { FutexParkingDelegator }
+        private val lock = NativeMutex { PosixParkingDelegator }
         private val check = AtomicInt(0)
         var n = 0
         fun lock() {

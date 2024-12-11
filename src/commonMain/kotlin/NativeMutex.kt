@@ -93,8 +93,10 @@ internal class NativeMutex(private val createDelegator: () -> ParkingDelegator) 
     }
     
     fun tryLock(): Boolean {
-        if (state.compareAndSet(0, 1)) {
-            owningThread.value = currentThreadId()
+        val currentThreadId = currentThreadId()
+        if (holdCount.value > 0 && owningThread.value == currentThreadId || state.compareAndSet(0, 1)) {
+            owningThread.value = currentThreadId
+            holdCount.incrementAndGet()
             return true
         }
         return false

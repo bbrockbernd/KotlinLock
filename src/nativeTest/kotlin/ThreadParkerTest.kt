@@ -2,10 +2,8 @@ import platform.posix.sleep
 import kotlin.native.concurrent.ObsoleteWorkersApi
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import kotlin.time.measureTime
 
 @OptIn(ObsoleteWorkersApi::class)
 class ThreadParkerTest {

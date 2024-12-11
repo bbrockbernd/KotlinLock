@@ -9,7 +9,6 @@ import kotlinx.cinterop.staticCFunction
 import kotlinx.cinterop.value
 import platform.posix.pthread_create
 import platform.posix.pthread_join
-import platform.posix.pthread_kill
 import platform.posix.pthread_tVar
 import platform.posix.sleep
 import kotlin.test.Ignore

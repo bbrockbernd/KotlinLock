@@ -1,5 +1,4 @@
 import kotlinx.cinterop.*
-import platform.posix.*
 import platform.windows.INFINITE
 import platform.windows.UINT64Var
 import platform.windows.WaitOnAddress

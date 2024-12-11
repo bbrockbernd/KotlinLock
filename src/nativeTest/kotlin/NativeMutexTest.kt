@@ -1,11 +1,9 @@
 import platform.posix.usleep
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-//@Ignore
 class NativeMutexTest {
     
     
@@ -46,7 +44,8 @@ class NativeMutexTest {
         fut1.result
         fut2.result
         
-        resultList.filterIndexed { i, _ -> i % 2 == 0 }.zip(resultList.filterIndexed {i, _ -> i % 2 == 1}) { a, b ->
+        resultList.filterIndexed { i, _ -> i % 2 == 0 }
+            .zip(resultList.filterIndexed {i, _ -> i % 2 == 1}) { a, b ->
             assertEquals(a, b)
         }
     }
@@ -94,7 +93,9 @@ class NativeMutexTest {
         fut1.result
         fut2.result
         
-        resultList.filterIndexed { i, _ -> i % 2 == 0 }.zip(resultList.filterIndexed {i, _ -> i % 2 == 1}) { a, b ->
+        resultList
+            .filterIndexed { i, _ -> i % 2 == 0 }
+            .zip(resultList.filterIndexed {i, _ -> i % 2 == 1}) { a, b ->
             assertEquals(a, b)
         }
     }
