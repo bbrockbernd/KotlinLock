@@ -22,7 +22,7 @@ class QosTest {
     @Test
     fun qosTest() {
         memScoped {
-            val mutex = NativeMutex { FutexParkingDelegator }
+            val mutex = NativeMutex { PosixParkingDelegator }
             val pthread = alloc<pthread_tVar>()
             val cRef = StableRef.create(mutex).asCPointer()
 

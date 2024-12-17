@@ -7,7 +7,7 @@ class ReentrancyTests {
     
     @Test
     fun reentrantTest() {
-        val lock = NativeMutex { FutexParkingDelegator }
+        val lock = NativeMutex { PosixParkingDelegator }
         lock.lock()
         lock.lock()
         lock.unlock()
@@ -17,7 +17,7 @@ class ReentrancyTests {
     
     @Test
     fun reentrantTest2() {
-        val lock = NativeMutex { FutexParkingDelegator }
+        val lock = NativeMutex { PosixParkingDelegator }
         lock.lock()
         lock.lock()
         lock.unlock()

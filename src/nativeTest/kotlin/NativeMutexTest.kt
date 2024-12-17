@@ -9,7 +9,7 @@ class NativeMutexTest {
     
     @Test
     fun testNativeMutexSlow() {
-        val mutex = NativeMutex { FutexParkingDelegator }
+        val mutex = NativeMutex { PosixParkingDelegator }
         val resultList = mutableListOf<String>()
 
         val worker1 = Worker.start()
@@ -52,7 +52,7 @@ class NativeMutexTest {
 
     @Test
     fun testNativeMutexFast() {
-        val mutex = NativeMutex { FutexParkingDelegator }
+        val mutex = NativeMutex { PosixParkingDelegator }
         val resultList = mutableListOf<String>()
 
         val worker1 = Worker.start()

@@ -26,8 +26,10 @@ class NativeMutexLincheckReentrantTest {
     @Operation
     fun add(n: Int) {
         lock.lock()
-        lock.lock()
+        if (!lock.tryLock()) throw IllegalStateException("couldnt reent with trylock")
+        if (!lock.tryLock()) throw IllegalStateException("couldnt reent with trylock")
         mutableList.add(n)
+        lock.unlock()
         lock.unlock()
         lock.unlock()
     }
@@ -35,8 +37,10 @@ class NativeMutexLincheckReentrantTest {
     @Operation
     fun removeFirst(): Int? {
         lock.lock()
-        lock.lock()
+        if (!lock.tryLock()) throw IllegalStateException("couldnt reent with trylock")
+        if (!lock.tryLock()) throw IllegalStateException("couldnt reent with trylock")
         val bla =  mutableList.removeFirstOrNull()
+        lock.unlock()
         lock.unlock()
         lock.unlock()
         return bla

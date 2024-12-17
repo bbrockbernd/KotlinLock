@@ -8,114 +8,36 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
-    val linuxTargets = listOf(
-        // Tier 2,
-        linuxX64(),
-        linuxArm64(),
-    )
-    
-    val androidNativeTargets = listOf(
-        // Tier 3
-        androidNativeArm32(),
-        androidNativeArm64(),
-        androidNativeX86(),
-        androidNativeX64(),
-    )
+    // Tier 1
+    macosX64()
+    macosArm64()
+    iosSimulatorArm64()
+    iosX64()
 
-    // apple targets
-    val appleTargets = listOf (
-        // Tier 1
-        macosX64(),
-        macosArm64(),
-        iosSimulatorArm64(),
-        iosX64(),
+    // Tier 2
+    linuxX64()
+    linuxArm64()
+    watchosSimulatorArm64()
+    watchosX64()
+    watchosArm32()
+    watchosArm64()
+    tvosSimulatorArm64()
+    tvosX64()
+    tvosArm64()
+    iosArm64()
 
-        // Tier 2,
-        watchosSimulatorArm64(),
-        watchosX64(),
-        watchosArm32(),
-        watchosArm64(),
-        tvosSimulatorArm64(),
-        tvosX64(),
-        tvosArm64(),
-        iosArm64(),
-
-        // Tier 3
-        watchosDeviceArm64(),
-    )
+    // Tier 3
+    androidNativeArm32()
+    androidNativeArm64()
+    androidNativeX86()
+    androidNativeX64()
+    mingwX64()
+    watchosDeviceArm64()
     
     applyDefaultHierarchyTemplate()
-    
-    mingwX64 {
-        binaries.all {
-            linkerOpts += "-lSynchronization"
-        }
-        compilations.getByName("main").cinterops {
-            val ulock by creating {
-                defFile(project.file("stub.def"))
-                packageName = "stub"
-            }
-            val posixcombo by creating {
-                defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
-                packageName = "platform.posix"
-            }
-        }
-    }
-    
-    linuxTargets.forEach {
-        it.compilations.getByName("main").cinterops {
-            val ulock by creating {
-                defFile(project.file("stub.def"))
-                packageName = "stub"
-            }
-            val posixcombo by creating {
-                defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
-                packageName = "platform.posix"
-            }
-        }
-    }
-
-    androidNativeTargets.forEach {
-        it.compilations.getByName("main").cinterops {
-            val ulock by creating {
-                defFile(project.file("stub.def"))
-                packageName = "stub"
-            }
-            val posixcombo by creating {
-                defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
-                packageName = "platform.posix"
-            }
-        }
-    }
-    
-    appleTargets.forEach {
-        it.compilations.getByName("main").cinterops {
-            val ulock by creating {
-                defFile(project.file("src/nativeInterop/cinterop/ulock.def"))
-                packageName = "platform.darwin.ulock"
-                includeDirs("${project.rootDir}/src/nativeInterop/cinterop")
-            }
-            val posixcombo by creating {
-                defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
-                packageName = "platform.posix"
-            }
-        }
-    }
 
     @Suppress("DEPRECATION") //https://github.com/Kotlin/kotlinx-atomicfu/issues/207
-    linuxArm32Hfp {
-        compilations.getByName("main").cinterops {
-            // This is a hack to fix commonization bug: KT-73136
-            val ulock by creating {
-                defFile(project.file("stub.def"))
-                packageName = "stub"
-            }
-            val posixcombo by creating {
-                defFile(project.file("src/nativeInterop/cinterop/posixcombo.def"))
-                packageName = "platform.posix"
-            }
-        }
-    }
+    linuxArm32Hfp()
     
     sourceSets {
         commonMain.dependencies {
@@ -134,15 +56,50 @@ kotlin {
         jvmTest.dependencies {
             implementation("org.jetbrains.kotlinx:lincheck:2.34")
         }
-        
+
+        val androidNative64Main by creating { dependsOn(nativeMain.get()) }
+        androidNative64Main.also {
+            androidNativeArm64Main.get().dependsOn(it)
+            androidNativeX64Main.get().dependsOn(it)
+        }
+
+        val androidNative32Main by creating { dependsOn(nativeMain.get()) }
+        androidNative32Main.let {
+            androidNativeArm32Main.get().dependsOn(it)
+            androidNativeX86Main.get().dependsOn(it)
+        }
         
         val linux64Main by creating { dependsOn(nativeMain.get()) }
-        linuxX64Main.get().dependsOn(linux64Main)
-        linuxArm64Main.get().dependsOn(linux64Main)
+        linux64Main.let {
+            linuxX64Main.get().dependsOn(it)
+            linuxArm64Main.get().dependsOn(it)
+        }
         
         val linux32Main by creating { dependsOn(nativeMain.get()) }
-        linuxArm32HfpMain.get().dependsOn(linux32Main)
+        linux32Main.let {
+            linuxArm32HfpMain.get().dependsOn(it)
+        }
         
+        val apple64Main by creating { dependsOn(nativeMain.get()) }
+        apple64Main.let {
+            watchosDeviceArm64Main.get().dependsOn(it)
+            iosArm64Main.get().dependsOn(it)
+            tvosArm64Main.get().dependsOn(it)
+            tvosX64Main.get().dependsOn(it)
+            tvosSimulatorArm64Main.get().dependsOn(it)
+            watchosX64Main.get().dependsOn(it)
+            watchosSimulatorArm64Main.get().dependsOn(it)
+            iosX64Main.get().dependsOn(it)
+            iosSimulatorArm64Main.get().dependsOn(it)
+            macosX64Main.get().dependsOn(it)
+            macosArm64Main.get().dependsOn(it)
+        }
+        
+        val apple32Main by creating { dependsOn(nativeMain.get()) }
+        apple32Main.let {
+            watchosArm32Main.get().dependsOn(it)
+            watchosArm64Main.get().dependsOn(it) // Uses Int for timespec
+        }
     }
 }
 

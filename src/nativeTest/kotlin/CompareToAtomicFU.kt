@@ -1,4 +1,5 @@
 import kotlinx.atomicfu.locks.ReentrantLock
+import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlin.native.concurrent.Future
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
@@ -30,28 +31,37 @@ class CompareToAtomicFU {
         }
         assertTrue(accumulatedDifference > 0)
     }
-    
+
     @Test
-    fun compareAtomicFU3Threads() = compareAtomicFUMultiThread(3)
-    
+    fun compareAtomicFU3ThreadsFair() = compareAtomicFUMultiThread(3, true)
+
     @Test
-    fun compareAtomicFU5Threads() = compareAtomicFUMultiThread(5)
-    
+    fun compareAtomicFU5ThreadsFair() = compareAtomicFUMultiThread(5, true)
+
     @Test
-    fun compareAtomicFU7Threads() = compareAtomicFUMultiThread(7)
-    
-    fun compareAtomicFUMultiThread(nThreads: Int) {
+    fun compareAtomicFU7ThreadsFair() = compareAtomicFUMultiThread(7, true)
+
+    @Test
+    fun compareAtomicFU3ThreadsRandom() = compareAtomicFUMultiThread(3, false)
+
+    @Test
+    fun compareAtomicFU5ThreadsRandom() = compareAtomicFUMultiThread(5, false)
+
+    @Test
+    fun compareAtomicFU7ThreadsRandom() = compareAtomicFUMultiThread(7, false)
+
+    fun compareAtomicFUMultiThread(nThreads: Int, fair: Boolean) {
         var accumulatedDifference = 0L
         repeat(3) {
             val timeNew = measureTime {
                 val newLock = NewLockInt()
-                mulitTestLock(newLock, nThreads)
+                mulitTestLock(newLock, nThreads, fair)
             }
             println("New $timeNew")
-            
+
             val timeOld = measureTime {
                 val oldLock = OldLockInt()
-                mulitTestLock(oldLock, nThreads)
+                mulitTestLock(oldLock, nThreads, fair)
             }
             println("Old $timeOld")
             accumulatedDifference += timeOld.toLong(DurationUnit.MILLISECONDS) - timeNew.toLong(DurationUnit.MILLISECONDS)
@@ -60,7 +70,7 @@ class CompareToAtomicFU {
     }
 
     fun singleTNew() {
-        val nativeMutex = NativeMutex { FutexParkingDelegator }
+        val nativeMutex = NativeMutex { PosixParkingDelegator }
         repeat(1000000) {
             nativeMutex.lock()
             nativeMutex.unlock()
@@ -68,18 +78,18 @@ class CompareToAtomicFU {
     }
 
     fun singleTOld() {
-        val reentrantLock: ReentrantLock = ReentrantLock()
+        val reentrantLock = SynchronizedObject()
         repeat(1000000) {
             reentrantLock.lock()
             reentrantLock.unlock()
         }
     }
-    
-    fun mulitTestLock(lockInt: LockInt, nThreads: Int) {
-        val countTo = 100000
+
+    fun mulitTestLock(lockInt: LockInt, nThreads: Int, fair: Boolean) {
+        val countTo = 10000
         val futureList = mutableListOf<Future<Unit>>()
         repeat(nThreads) { i ->
-            val test = LockIntTest(lockInt, countTo, nThreads, i)
+            val test = LockIntTest(lockInt, countTo, nThreads, i, fair)
             futureList.add(testWithWorker(test))
         }
         futureList.forEach {
@@ -92,7 +102,11 @@ class CompareToAtomicFU {
         return worker.execute(TransferMode.UNSAFE, { test }) { t ->
             while (true) {
                 t.lockInt.lock()
-                if (t.lockInt.n % t.mod == t.id) t.lockInt.n++
+                if (t.fair && t.lockInt.n % t.mod == t.id) t.lockInt.n++
+                if (!t.fair && t.lockInt.rand == t.id) {
+                    t.lockInt.n++
+                    t.lockInt.rand = (0..< t.mod).random()
+                }
                 if (t.lockInt.n >= t.max) {
                     t.lockInt.unlock()
                     break
@@ -101,24 +115,27 @@ class CompareToAtomicFU {
             }
         }
     }
-    
+
     data class LockIntTest(
         val lockInt: LockInt,
         val max: Int,
         val mod: Int,
         val id: Int,
+        val fair: Boolean
     )
 
     class NewLockInt: LockInt{
-        private val lock = NativeMutex { FutexParkingDelegator }
+        private val lock = NativeMutex { PosixParkingDelegator }
         override var n = 0
+        override var rand = 0
         override fun lock() = lock.lock()
         override fun unlock() = lock.unlock()
     }
 
     class OldLockInt: LockInt {
-        private val lock = ReentrantLock()
+        private val lock = SynchronizedObject()
         override var n = 0
+        override var rand = 0
         override fun lock() = lock.lock()
         override fun unlock() = lock.unlock()
     }
@@ -127,5 +144,6 @@ class CompareToAtomicFU {
         fun lock()
         fun unlock()
         var n: Int
+        var rand: Int
     }
 }
