@@ -4,7 +4,7 @@ import kotlinx.atomicfu.atomic
  * This is defined in common to be testable with lincheck.
  * Should in practice never be used on jvm.
  */
-// TODO verify thread ID
+
 internal class ThreadParker(private val delegator: ParkingDelegator) {
     private val state = atomic(STATE_FREE)
     private val atomicRef = atomic<Any?>(null)

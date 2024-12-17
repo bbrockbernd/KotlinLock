@@ -1,1 +1,0 @@
-actual fun currentThreadId(): Long = Thread.currentThread().id

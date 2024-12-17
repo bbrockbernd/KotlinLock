@@ -124,7 +124,7 @@ class CompareToAtomicFU {
         val fair: Boolean
     )
 
-    class NewLockInt: LockInt{
+    class NewLockInt: LockInt {
         private val lock = NativeMutex { PosixParkingDelegator }
         override var n = 0
         override var rand = 0
